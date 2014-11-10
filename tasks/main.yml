@@ -1,0 +1,26 @@
+---
+
+- name: Install nginx
+  apt: name=nginx-full state=present
+  tags:
+    - nginx
+
+- name: Disable nginx default website
+  file: path=/etc/nginx/sites-enabled/default state=absent
+  tags:
+    - nginx
+
+- name: Copy SSL configuration
+  template: src=ssl.conf.j2 dest=/etc/nginx/conf.d/ssl.conf
+  tags:
+    - nginx
+    - ssl
+
+- name: Copy firewall configuration
+  template: src=firewall.conf.j2 dest=/etc/nginx/conf.d/firewall.conf
+  sudo: true
+  tags:
+    - nginx
+    - firewall
+
+- include: logstash.yml

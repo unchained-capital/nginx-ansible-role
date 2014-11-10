@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  author: "Dhruv Bansal"
+  license: MIT
+  min_ansible_version: 1.6
+  platforms:
+   - name: Ubuntu
+     versions:
+      - trusty
+  categories:
+   - webservers
+dependencies: []

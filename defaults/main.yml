@@ -1,0 +1,18 @@
+---
+
+nginx_user: www-data
+nginx_group: www-data
+
+nginx_log_dir: /var/log/nginx
+
+nginx_worker_processes: 1
+nginx_worker_connections: 1024
+
+nginx_whitelisted_ips: []
+nginx_auth_realm: Restricted
+nginx_auth_file:  /etc/nginx/conf.d/users
+
+nginx_ssl_certificate:     /etc/ssl/certs/example.com.crt
+nginx_ssl_certificate_key: /etc/ssl/private/example.com.key;
+
+logstash_conf_dir: /etc/logstash/conf.d

@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+{% for ip in nginx_whitelisted_ips %}
+allow {{ ip }};
+{% endfor %}
+deny  all;
+
+auth_basic           "{{ nginx_auth_realm }}";
+auth_basic_user_file {{ nginx_auth_file }};
+
+satisfy any;
