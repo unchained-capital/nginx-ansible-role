@@ -18,7 +18,6 @@
 
 - name: Copy firewall configuration
   template: src=firewall.conf.j2 dest=/etc/nginx/conf.d/firewall.conf
-  sudo: true
   tags:
     - nginx
     - firewall
