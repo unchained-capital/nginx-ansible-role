@@ -1,12 +1,13 @@
 ---
 
 - name: Install nginx
-  apt: name=nginx-full state=present
+  apt: name={{ nginx_package }} state=present
   tags:
     - nginx
 
 - name: Disable nginx default website
   file: path=/etc/nginx/sites-enabled/default state=absent
+  when: nginx_disable_default_site
   notify:
     - restart nginx
   tags:

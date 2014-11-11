@@ -1,35 +1,74 @@
-This is an Ansible role that installs and secures nginx.  It is
-convenient to use as a base role upon which to let other roles define
-specific virtual servers for nginx.
+This is an [Ansible](http://www.ansible.com/home) role for installing
+[nginx](http://wiki.nginx.org/Main) in a relatively secure way.
 
-Other than just running `apt-get install nginx-full`, this role will
+# What it Does
 
-1. Disable the default website that ships with nginx.
-2. Create an nginx configuration file that can be used for SSL.
-  * File will be in `/etc/nginx/conf.d/ssl.conf` and can be included
-    by subsequent virtual server definitions.
-  * This assumes that the values of the variables
-    `nginx_ssl_certificate` and `nginx_ssl_certificate_key` have been
-    set to paths on disk where the SSL certificate and private key can
-    be found.
-3. Create an nginx configuration file that can be used for for a
-   simple firewall
-   * File will be in `/etc/nginx/conf.d/firewall.conf` and can be
-     included by subsequent virtual server definitions.
-   * Assumes the value of the variable `nginx_auth_file` has been set
-     to a path on disk where an nginx user password file can be found.
-   * Whitelists IPs in in `nginx_whitelisted_ips` and denys all other
-     traffic.
-   * Traffic must satisfy either the basic authentication or the IP
-     whitelist to proceed.
-4. Configures a logstash input file for the logs produced by nginx.
+## Assumptions
 
-Tasks are tagged with
+This installation is only as secure as you make it.  It assumes you
+have an
+[SSL certificate](https://www.globalsign.com/ssl-information-center/what-is-an-ssl-certificate.html)
+(`nginx_ssl_certificate`, `nginx_ssl_certificate_key`) and an
+[htpasswd](https://httpd.apache.org/docs/current/programs/htpasswd.html)
+(`nginx_auth_file`) file that you have securely transferred to the
+webserver node.
 
-* nginx
-* ssl
-* firewall
-* logstash
+## Software
 
-as appropriate.
+Installs nginx which provides the following `nginx` command.
 
+Also removes the default nginx virtual hosts.  Disable this by setting
+`nginx_disable_default_site` to `false`.  Build your own more secure
+virtual hosts using the SSL and firewall definitions provided below.
+
+Also creates a logstash file for nginx logs.  Disable this by settings
+`nginx_use_logstash` to `false`.
+
+### SSL
+
+Defines shared SSL parameters at `/etc/nginx/conf.d/ssl.conf` that can
+be used later by virtual servers desiring to implement SSL.
+
+### Firewall
+
+Creates a firewall definition at `/etc/nginx/conf.d/firewall.conf`
+which forces traffic to either be on a whitelist of IPs
+(`nginx_whitelisted_ips`) or to login via basic authentication based on an **already existing**
+
+## Configuration & Logging
+
+Creates the files:
+
+* `/etc/nginx/conf.d/firewall.conf` -- firewall for hosts needing to restrict access
+* `/etc/nginx/conf.d/ssl.conf` -- shared SSL parameters for hosts needing SSL
+* `/var/log/nginx` -- log directory
+* `/etc/logstash/conf.d/nginx.conf` -- inputs for logstash
+
+## Services
+
+Leaves a service `nginx` running without any virtual hosts.
+
+# Usage
+
+Use the role in a playbook like this:
+
+```yaml
+- hosts: all
+  roles:
+    - nginx
+```
+
+## Variables
+
+The following variables are exposed for configuration:
+
+* `nginx_package` -- the name of the nginx package to install (default: `nginx-full`)
+* `nginx_user` -- the user to run nginx worker processes as (default: `www-data`)
+* `nginx_group` -- the group to run nginx worker processes as (default: `www-data`)
+* `nginx_worker_processes` -- number of nginx worker processes
+* `nginx_worker_connections` -- number of nginx worker connections
+* `nginx_whitelisted_ips` -- IP addresses which will be whitelisted in the firewall
+* `nginx_auth_realm` -- name of basic authentication realm for firewall (default: Restricted)
+* `nginx_auth_file` -- path to existing nginx auth file
+* `nginx_ssl_certificate` -- path to existing nginx SSL certificate
+* `nginx_ssl_certificate_key` -- path to existing nginx SSL key

@@ -1,5 +1,7 @@
 ---
 
+nginx_package: nginx-full
+
 nginx_user: www-data
 nginx_group: www-data
 
@@ -15,4 +17,7 @@ nginx_auth_file:  /etc/nginx/conf.d/users
 nginx_ssl_certificate:     /etc/ssl/certs/example.com.crt
 nginx_ssl_certificate_key: /etc/ssl/private/example.com.key;
 
+nginx_disable_default_site: true
+
+nginx_use_logstash: true
 logstash_conf_dir: /etc/logstash/conf.d
