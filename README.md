@@ -31,15 +31,16 @@ be used later by virtual servers desiring to implement SSL.
 
 ### Firewall
 
-Creates a firewall definition at `/etc/nginx/conf.d/firewall.conf`
-which forces traffic to either be on a whitelist of IPs
-(`nginx_whitelisted_ips`) or to login via basic authentication based on an **already existing**
+Creates a firewall definition at `/etc/nginx/firewall.conf` which
+forces traffic to either be on a whitelist of IPs
+(`nginx_whitelisted_ips`) or to login via basic authentication based
+on an **already existing** users file.
 
 ## Configuration & Logging
 
 Creates the files:
 
-* `/etc/nginx/conf.d/firewall.conf` -- firewall for hosts needing to restrict access
+* `/etc/nginx/firewall.conf` -- firewall for hosts needing to restrict access
 * `/etc/nginx/conf.d/ssl.conf` -- shared SSL parameters for hosts needing SSL
 * `/var/log/nginx` -- log directory
 * `/etc/logstash/conf.d/nginx.conf` -- inputs for logstash

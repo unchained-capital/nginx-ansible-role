@@ -22,7 +22,7 @@
     - ssl
 
 - name: Copy firewall configuration
-  template: src=firewall.conf.j2 dest=/etc/nginx/conf.d/firewall.conf
+  template: src=firewall.conf.j2 dest=/etc/nginx/firewall.conf
   notify:
     - restart nginx
   tags:
