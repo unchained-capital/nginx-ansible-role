@@ -14,7 +14,7 @@
     - nginx
 
 - name: Copy SSL configuration
-  template: src=ssl.conf.j2 dest=/etc/nginx/conf.d/ssl.conf
+  template: src=ssl.conf.j2 dest=/etc/nginx/ssl.conf
   notify:
     - restart nginx
   tags:
