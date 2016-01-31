@@ -5,6 +5,13 @@
   tags:
     - nginx
 
+- name: Install supproting packages
+  action: apt name={{ item.value.apt_name }}
+  when: ansible_pkg_mgr == "apt"
+  with_dict: nginx_packages
+  tags:
+    - nginx
+    
 - name: Disable nginx default website
   file: path=/etc/nginx/sites-enabled/default state=absent
   when: nginx_disable_default_site
@@ -14,7 +21,7 @@
     - nginx
 
 - name: Copy SSL configuration
-  template: src=ssl.conf.j2 dest=/etc/nginx/ssl.conf
+  template: src=ssl.conf.j2 dest=/etc/nginx/ssl.conf owner=root group=root mode=0644
   notify:
     - restart nginx
   tags:
@@ -22,7 +29,15 @@
     - ssl
 
 - name: Copy firewall configuration
-  template: src=firewall.conf.j2 dest=/etc/nginx/firewall.conf
+  template: src=firewall.conf.j2 dest=/etc/nginx/firewall.conf owner=root group=root mode=0644
+  notify:
+    - restart nginx
+  tags:
+    - nginx
+    - firewall
+
+- name: Set firewall users
+  template: src=users.conf.j2 dest=/etc/nginx/conf.d/users owner=root group=root mode=0644
   notify:
     - restart nginx
   tags:

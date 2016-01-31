@@ -6,6 +6,6 @@ allow {{ ip }};
 deny  all;
 
 auth_basic           "{{ nginx_auth_realm }}";
-auth_basic_user_file {{ nginx_auth_file }};
+auth_basic_user_file /etc/nginx/conf.d/users;
 
 satisfy any;

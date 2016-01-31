@@ -1,6 +1,10 @@
 ---
 
 nginx_package: nginx-full
+nginx_packages:
+  apache2_utils:
+    name: utils for webservers
+    apt_name: apache2-utils
 
 nginx_user: www-data
 nginx_group: www-data
@@ -12,10 +16,11 @@ nginx_worker_connections: 1024
 
 nginx_whitelisted_ips: []
 nginx_auth_realm: Restricted
-nginx_auth_file:  /etc/nginx/conf.d/users
 
 nginx_ssl_certificate:     /etc/ssl/certs/example.com.crt
-nginx_ssl_certificate_key: /etc/ssl/private/example.com.key;
+nginx_ssl_certificate_key: /etc/ssl/private/example.com.key
+
+nginx_firewall_users: []
 
 nginx_disable_default_site: true
 
