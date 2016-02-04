@@ -21,9 +21,6 @@ Also removes the default nginx virtual hosts.  Disable this by setting
 `nginx_disable_default_site` to `false`.  Build your own more secure
 virtual hosts using the SSL and firewall definitions provided below.
 
-Also creates a logstash file for nginx logs.  Disable this by settings
-`nginx_use_logstash` to `false`.
-
 ### SSL
 
 Defines shared SSL parameters at `/etc/nginx/ssl.conf`.  These SSL
@@ -58,7 +55,6 @@ Creates the files:
 * `/etc/nginx/firewall.conf` -- firewall for virtual hosts needing to restrict access
 * `/etc/nginx/ssl.conf` -- shared SSL parameters for virtual hosts needing SSL
 * `/var/log/nginx` -- log directory
-* `/etc/logstash/conf.d/nginx.conf` -- inputs for logstash
 
 ## Services
 
