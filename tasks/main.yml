@@ -44,4 +44,17 @@
     - nginx
     - firewall
 
-- include: logstash.yml
+- name: Copy status collection endpoint configuration
+  template: src=status.conf.j2 dest=/etc/nginx/sites-available/status.conf owner=root group=root mode=0644
+  notify:
+    - restart nginx
+  tags:
+    - nginx
+
+- name: Enable status collection endpoint
+  when: nginx_use_status
+  file: state=link src=/etc/nginx/sites-available/status.conf dest=/etc/nginx/sites-enabled/status.conf owner=root group=root mode=0644
+  notify:
+    - restart nginx
+  tags:
+    - nginx

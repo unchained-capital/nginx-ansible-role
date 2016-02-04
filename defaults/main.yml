@@ -1,5 +1,9 @@
 ---
 
+#
+# Installation
+# 
+
 nginx_package: nginx-full
 nginx_packages:
   apache2_utils:
@@ -14,6 +18,10 @@ nginx_log_dir: /var/log/nginx
 nginx_worker_processes: 1
 nginx_worker_connections: 1024
 
+#
+# Security
+#
+
 nginx_whitelisted_ips: []
 nginx_auth_realm: Restricted
 
@@ -24,5 +32,10 @@ nginx_firewall_users: []
 
 nginx_disable_default_site: true
 
-nginx_use_logstash: true
-logstash_conf_dir: /etc/logstash/conf.d
+#
+# Stub Status
+#
+nginx_use_status: false
+nginx_status_requires_arg: true
+nginx_status_port: 1333
+nginx_restrict_status_to_local: true

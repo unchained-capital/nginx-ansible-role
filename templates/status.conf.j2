@@ -1,0 +1,14 @@
+server {
+    listen              127.0.0.1:{{ nginx_status_port }};
+    server_name         _ ;
+
+    access_log          {{ nginx_log_dir }}/nginx.access.log;
+    error_log           {{ nginx_log_dir }}/nginx.error.log;
+    
+    location /status {
+       stub_status{% if nginx_status_requires_arg %} on{% endif %};
+       allow 127.0.0.1;
+       deny  all;
+       satisfy any;
+    }
+}
