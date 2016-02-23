@@ -21,7 +21,7 @@
     - nginx
 
 - name: Copy SSL configuration
-  template: src=ssl.conf.j2 dest=/etc/nginx/ssl.conf owner=root group=root mode=0644
+  template: src=ssl.conf.j2 dest={{ nginx_ssl_params }} owner=root group=root mode=0644
   notify:
     - restart nginx
   tags:
@@ -29,7 +29,7 @@
     - ssl
 
 - name: Copy firewall configuration
-  template: src=firewall.conf.j2 dest=/etc/nginx/firewall.conf owner=root group=root mode=0644
+  template: src=firewall.conf.j2 dest={{ nginx_firewall_params }} owner=root group=root mode=0644
   notify:
     - restart nginx
   tags:

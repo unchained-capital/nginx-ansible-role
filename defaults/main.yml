@@ -18,6 +18,8 @@ nginx_log_dir: /var/log/nginx
 nginx_worker_processes: 1
 nginx_worker_connections: 1024
 
+nginx_proxy_params: /etc/nginx/proxy_params
+
 #
 # Security
 #
@@ -27,8 +29,10 @@ nginx_auth_realm: Restricted
 
 nginx_ssl_certificate:     /etc/ssl/certs/example.com.crt
 nginx_ssl_certificate_key: /etc/ssl/private/example.com.key
+nginx_ssl_params: /etc/nginx/ssl.conf
 
 nginx_firewall_users: []
+nginx_firewall_params: /etc/nginx/firewall.conf
 
 nginx_disable_default_site: true
 
