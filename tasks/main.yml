@@ -1,14 +1,14 @@
 ---
 
 - name: Install nginx
-  apt: name={{ nginx_package }} state=present
+  apt: name="{{ nginx_package }}" state=present
   tags:
     - nginx
 
-- name: Install supproting packages
-  action: apt name={{ item.value.apt_name }}
+- name: Install supporting packages
+  action: apt name="{{ item.value.apt_name }}"
   when: ansible_pkg_mgr == "apt"
-  with_dict: nginx_packages
+  with_dict: "{{ nginx_packages }}"
   tags:
     - nginx
     
@@ -21,7 +21,7 @@
     - nginx
 
 - name: Copy SSL configuration
-  template: src=ssl.conf.j2 dest={{ nginx_ssl_params }} owner=root group=root mode=0644
+  template: src=ssl.conf.j2 dest="{{ nginx_ssl_params }}" owner=root group=root mode=0644
   notify:
     - restart nginx
   tags:
@@ -29,7 +29,7 @@
     - ssl
 
 - name: Copy firewall configuration
-  template: src=firewall.conf.j2 dest={{ nginx_firewall_params }} owner=root group=root mode=0644
+  template: src=firewall.conf.j2 dest="{{ nginx_firewall_params }}" owner=root group=root mode=0644
   notify:
     - restart nginx
   tags:
@@ -38,6 +38,7 @@
 
 - name: Set firewall users
   template: src=users.conf.j2 dest=/etc/nginx/conf.d/users owner=root group=root mode=0644
+  when: nginx_manage_firewall_users
   notify:
     - restart nginx
   tags:
