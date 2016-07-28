@@ -36,16 +36,3 @@ nginx_firewall_params: /etc/nginx/firewall.conf
 nginx_manage_firewall_users: true
 
 nginx_disable_default_site: true
-
-#
-# Stub Status
-#
-nginx_use_status: false
-nginx_status_listen: false
-nginx_status_port: 80
-nginx_status_default_server: false
-nginx_status_server_name: _
-nginx_status_path: /_nginx/status
-nginx_status_requires_arg: true
-nginx_status_allow_ip: false
-nginx_status_allow_localhost: true
