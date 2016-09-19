@@ -1,0 +1,97 @@
+# {{ ansible_managed }}
+
+user {{ nginx_user }};
+worker_processes {{ nginx_worker_processes }};
+pid /run/nginx.pid;
+
+events {
+       worker_connections {{ nginx_worker_connections }};
+       # multi_accept on;
+}
+
+http {
+
+     ##
+     # Basic Settings
+     ##
+
+     sendfile    {% if nginx_sendfile %}on{% else %}off{% endif %};
+     tcp_nopush  {% if nginx_tcp_nopush %}on{% else %}off{% endif %};
+     tcp_nodelay {% if nginx_tcp_nodelay %}on{% else %}off{% endif %};
+     keepalive_timeout {{ nginx_keepalive_timeout }};
+     types_hash_max_size 2048;
+     # server_tokens off;
+
+     # server_names_hash_bucket_size 64;
+     # server_name_in_redirect off;
+
+     include {{ nginx_mime_types }};
+     default_type {{ nginx_default_mime_type }};
+
+     ##
+     # Logging Settings
+     ##
+
+     access_log {{ nginx_log_dir }}/access.log;
+     error_log  {{ nginx_log_dir }}/error.log;
+
+     ##
+     # Gzip Settings
+     ##
+
+     gzip {% if nginx_gzip %}on{% else %}off{% endif %};
+     gzip_disable "msie6";
+
+     # gzip_vary on;
+     # gzip_proxied any;
+     # gzip_comp_level 6;
+     # gzip_buffers 16 8k;
+     # gzip_http_version 1.1;
+     # gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+     ##
+     # nginx-naxsi config
+     ##
+     # Uncomment it if you installed nginx-naxsi
+     ##
+
+     #include {{ nginx_naxsi_rules }};
+
+     ##
+     # nginx-passenger config
+     ##
+     # Uncomment it if you installed nginx-passenger
+     ##
+     
+     #passenger_root /usr;
+     #passenger_ruby /usr/bin/ruby;
+
+     ##
+     # Virtual Host Configs
+     ##
+
+     include {{ nginx_conf_dir }}/conf.d/*.conf;
+     include {{ nginx_conf_dir }}/sites-enabled/*;
+}
+
+
+#mail {
+#     # See sample authentication script at:
+#     # http://wiki.nginx.org/ImapAuthenticateWithApachePhpScript
+# 
+# # auth_http localhost/auth.php;
+# # pop3_capabilities "TOP" "USER";
+# # imap_capabilities "IMAP4rev1" "UIDPLUS";
+# 
+# server {
+# 	 listen     localhost:110;
+#	 	    protocol   pop3;
+#		    	       proxy      on;
+#			       }
+# 
+# server {
+# 	 listen     localhost:143;
+#	 	    protocol   imap;
+#		    	       proxy      on;
+#			       }
+#}

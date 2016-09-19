@@ -2,37 +2,94 @@
 
 #
 # Installation
-# 
+#
 
-nginx_package: nginx-full
 nginx_packages:
-  apache2_utils:
-    name: utils for webservers
-    apt_name: apache2-utils
+  - nginx-full
+  - apache2-utils
 
-nginx_user: www-data
+nginx_install_source: false
+
+nginx_version:          1.11.4           # latest as of 2016-09-18
+nginx_release_basename: "nginx-{{ nginx_version }}"
+nginx_release_url:      "https://nginx.org/download/{{ nginx_release_basename }}.tar.gz"
+
+nginx_user:  www-data
 nginx_group: www-data
 
-nginx_log_dir: /var/log/nginx
+nginx_download_dir: /usr/local/src
+nginx_log_dir:      /var/log/nginx
+nginx_home_dir:     /srv
+nginx_conf_dir:     /etc/nginx
 
-nginx_worker_processes: 1
-nginx_worker_connections: 1024
+#
+# Configuration
+#
 
 nginx_proxy_params: /etc/nginx/proxy_params
+nginx_fastcgi_params: /etc/nginx/fastcgi_params
+nginx_scgi_params: /etc/nginx/scgi_params
+nginx_uwsgi_params: /etc/nginx/uwsgi_params
+nginx_mime_types:   /etc/nginx/mime.types
+nginx_naxsi_rules:  /etc/nginx/naxsi_core.rules
+
+nginx_worker_processes: 4
+nginx_worker_connections: 768
+
+nginx_sendfile: on
+nginx_tcp_nopush: on
+nginx_tcp_nodelay: on
+nginx_keepalive_timeout: 65
+nginx_default_mime_type: 'application/octet-stream'
+nginx_gzip: on
 
 #
-# Security
+# Source Installation
 #
 
-nginx_whitelisted_ips: []
-nginx_auth_realm: Restricted
+nginx_base_configure_flags:
+  - "--with-cc-opt='-g -O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2'"
+  - "--with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro'"
+  - --conf-path=/etc/nginx/nginx.conf
+  - --http-log-path=/var/log/nginx/access.log
+  - --error-log-path=/var/log/nginx/error.log
+  - --lock-path=/var/lock/nginx.lock
+  - --pid-path=/run/nginx.pid
+  - --http-client-body-temp-path=/var/lib/nginx/body
+  - --http-fastcgi-temp-path=/var/lib/nginx/fastcgi
+  - --http-proxy-temp-path=/var/lib/nginx/proxy
+  - --http-scgi-temp-path=/var/lib/nginx/scgi
+  - --http-uwsgi-temp-path=/var/lib/nginx/uwsgi
+nginx_default_configure_flags:
+  # Additional configure flags for nginx 1.4.6 as compiled for Ubuntu
+  # 14.04.3's 'nginx-full' package.
+  - --with-debug
+  - --with-pcre-jit
+  - --with-ipv6
+  - --with-http_ssl_module
+  - --with-http_stub_status_module
+  - --with-http_realip_module
+  - --with-http_addition_module
+  - --with-http_dav_module
+  - --with-http_geoip_module
+  - --with-http_gzip_static_module
+  - --with-http_sub_module
+  - --with-http_xslt_module
+  - --with-mail
+  - --with-mail_ssl_module
+nginx_custom_configure_flags: []
+nginx_default_modules:
+    - https://github.com/stogh/ngx_http_auth_pam_module
+    - https://github.com/arut/nginx-dav-ext-module
+    - https://github.com/openresty/echo-nginx-module
+    - https://github.com/gnosek/nginx-upstream-fair
+    - https://github.com/yaoweibin/ngx_http_substitutions_filter_module
+nginx_custom_modules: []
+nginx_default_source_packages:
+  - libpcre3
+  - libpcre3-dev
+  - libgeoip-dev
+  - libpam-dev
+nginx_custom_source_packages: []  
 
-nginx_ssl_certificate:     /etc/ssl/certs/example.com.crt
-nginx_ssl_certificate_key: /etc/ssl/private/example.com.key
-nginx_ssl_params: /etc/nginx/ssl.conf
-
-nginx_firewall_users: []
-nginx_firewall_params: /etc/nginx/firewall.conf
-nginx_manage_firewall_users: true
-
-nginx_disable_default_site: true
+nginx_source_install_dir: /usr/local/nginx

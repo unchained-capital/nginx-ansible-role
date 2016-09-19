@@ -1,46 +1,18 @@
 ---
 
-- name: Install nginx
-  apt: name="{{ nginx_package }}" state=present
-  tags:
-    - nginx
+- name: Ensure nginx packages are installed
+  apt: name="{{ item }}" state=present
+  tags: [nginx, packages]
+  with_items: "{{ nginx_packages }}"
 
-- name: Install supporting packages
-  action: apt name="{{ item.value.apt_name }}"
-  when: ansible_pkg_mgr == "apt"
-  with_dict: "{{ nginx_packages }}"
-  tags:
-    - nginx
-    
-- name: Disable nginx default website
-  file: path=/etc/nginx/sites-enabled/default state=absent
-  when: nginx_disable_default_site
-  notify:
-    - restart nginx
-  tags:
-    - nginx
+- include: install_from_source.yml
+  when: "{{ nginx_install_source }}"
+  tags: [nginx, source]
 
-- name: Copy SSL configuration
-  template: src=ssl.conf.j2 dest="{{ nginx_ssl_params }}" owner=root group=root mode=0644
-  notify:
-    - restart nginx
-  tags:
-    - nginx
-    - ssl
-
-- name: Copy firewall configuration
-  template: src=firewall.conf.j2 dest="{{ nginx_firewall_params }}" owner=root group=root mode=0644
-  notify:
-    - restart nginx
-  tags:
-    - nginx
-    - firewall
-
-- name: Set firewall users
-  template: src=users.conf.j2 dest=/etc/nginx/conf.d/users owner=root group=root mode=0644
-  when: nginx_manage_firewall_users
-  notify:
-    - restart nginx
-  tags:
-    - nginx
-    - firewall
+- name: Ensure nginx configuration file is correct
+  template: src=templates/nginx.conf.j2 dest="{{ nginx_conf_dir }}/nginx.conf" owner=root group=root mode=0644
+  tags: [nginx, config]
+  
+- name: Ensure nginx is started and enabled
+  service: name=nginx state=started enabled=yes
+  tags: [nginx]

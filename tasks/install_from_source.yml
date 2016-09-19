@@ -1,0 +1,98 @@
+---
+
+#
+# Packages
+#
+
+- name: Install supporting packages for nginx
+  apt: name="{{ item }}" state=present
+  with_items: "{{ nginx_default_source_packages + nginx_custom_source_packages }}"
+
+#
+# User & Group
+#
+
+- name: Ensure user group exists
+  when: "{{ nginx_group_id is not defined }}"
+  group: name="{{ nginx_group }}"
+  
+- name: Ensure user group exists
+  when: "{{ nginx_group_id is defined }}"
+  group: name="{{ nginx_group }}" gid="{{ nginx_group_id }}"
+
+- name: Ensure user exists
+  when: "{{ nginx_user_id is not defined }}"
+  user: name="{{ nginx_user }}" home="{{ nginx_home_dir }}" comment="{{ nginx_user }}" group="{{ nginx_group }}" shell=/usr/sbin/nologin
+  
+- name: Ensure user exists
+  when: "{{ nginx_user_id is defined }}"
+  user: name="{{ nginx_user }}" home="{{ nginx_home_dir }}" comment="{{ nginx_user }}" group="{{ nginx_group }}" shell=/usr/sbin/nologin uid="{{ nginx_user_id }}"
+
+#
+# Download & extract source archive
+#
+
+- name: Ensure download directory exists
+  file: state=directory path="{{ nginx_download_dir }}" owner=root group=root mode=0755
+
+- name: Ensure source archive is downloaded
+  get_url: url="{{ nginx_release_url }}" dest="{{ nginx_download_dir }}/{{ nginx_release_basename }}.tar.gz" owner=root group=root mode=0644 validate_certs=no # FIXME
+
+- name: Ensure source archive is extracted
+  command: "tar -xzf {{ nginx_release_basename }}.tar.gz"
+  args:
+    chdir:   "{{ nginx_download_dir }}"
+    creates: "{{ nginx_download_dir }}/{{ nginx_release_basename }}"
+
+#
+# Configure, Make, Make Install
+#
+
+- name: Determine complete list of nginx modules
+  set_fact:
+    nginx_modules:         "{{ nginx_default_modules + nginx_custom_modules }}"
+    
+- name: Determine complete list of configure flags for nginx modules
+  set_fact:    
+    nginx_module_flags:    "{{ nginx_modules | nginx_add_module_flags(nginx_download_dir+'/'+nginx_release_basename+'/modules') }}"
+    
+- name: Determine complete configure flags
+  set_fact:    
+    nginx_configure_flags: "{{ (nginx_base_configure_flags + nginx_default_configure_flags + nginx_custom_configure_flags + nginx_module_flags) | join(' ') }}"
+
+- name: Ensure modules download directory exists
+  file: state=directory path="{{ nginx_download_dir }}/{{ nginx_release_basename }}/modules" owner=root group=root mode=0755
+
+- name: Ensure modules have downloaded
+  git: dest="{{ nginx_download_dir }}/{{ nginx_release_basename }}/modules/{{ item | basename }}" repo="{{ item }}" update=no
+  with_items: "{{ nginx_modules }}"
+    
+- name: Ensure source is configured and Makefile exists
+  command: "./configure {{ nginx_configure_flags }}"
+  args:
+    chdir: "{{ nginx_download_dir }}/{{ nginx_release_basename }}"
+    creates: "{{ nginx_download_dir }}/{{ nginx_release_basename }}/Makefile"
+    
+- name: Ensure source is compiled
+  command: "make"
+  register: nginx_make
+  args:
+    chdir: "{{ nginx_download_dir }}/{{ nginx_release_basename }}"
+  changed_when: |
+    {{ "Nothing to be done for `build'." not in nginx_make.stdout }}
+
+- name: Ensure compiled source is installed
+  command: "make install"
+  when: nginx_make.changed
+  args:
+    chdir: "{{ nginx_download_dir }}/{{ nginx_release_basename }}"
+
+#
+# Make Source Default
+#
+  
+- name: Ensure installed binary is symlinked onto PATH
+  file: state=link src="{{ nginx_source_install_dir }}/sbin/nginx" dest=/usr/local/sbin/nginx owner=root group=root mode=0755
+      
+- name: Ensure system init scripts use new source installation
+  lineinfile: dest=/etc/default/nginx regexp="^DAEMON=" line="DAEMON=/usr/local/sbin/nginx" state=present
