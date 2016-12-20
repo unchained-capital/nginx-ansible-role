@@ -10,7 +10,7 @@ nginx_packages:
 
 nginx_install_source: false
 
-nginx_version:          1.11.4           # latest as of 2016-09-18
+nginx_version:          1.11.7           # latest as of 2016-12-19
 nginx_release_basename: "nginx-{{ nginx_version }}"
 nginx_release_url:      "https://nginx.org/download/{{ nginx_release_basename }}.tar.gz"
 
@@ -65,7 +65,6 @@ nginx_default_configure_flags:
   # 14.04.3's 'nginx-full' package.
   - --with-debug
   - --with-pcre-jit
-  - --with-ipv6
   - --with-http_ssl_module
   - --with-http_stub_status_module
   - --with-http_realip_module
@@ -82,7 +81,8 @@ nginx_default_modules:
     - https://github.com/stogh/ngx_http_auth_pam_module
     - https://github.com/arut/nginx-dav-ext-module
     - https://github.com/openresty/echo-nginx-module
-    - https://github.com/gnosek/nginx-upstream-fair
+    # This guy breaks the build as of 2016-12-19, see https://forum.nginx.org/read.php?2,270963,270969#msg-270969
+    # - https://github.com/gnosek/nginx-upstream-fair
     - https://github.com/yaoweibin/ngx_http_substitutions_filter_module
 nginx_custom_modules: []
 nginx_default_source_packages:
@@ -90,6 +90,7 @@ nginx_default_source_packages:
   - libpcre3-dev
   - libgeoip-dev
   - libpam-dev
+  - libxslt-dev
 nginx_custom_source_packages: []  
 
 nginx_source_install_dir: /usr/local/nginx
