@@ -6,7 +6,11 @@
   with_items: "{{ nginx_packages }}"
 
 - include: install_from_source.yml
-  when: "{{ nginx_install_source }}"
+  when: "{{ nginx_install_source }}" and ansible_service_mgr != "systemd"
+  tags: [nginx, source]
+
+- include: install_from_source_systemd.yml
+  when: "{{ nginx_install_source }}" and ansible_service_mgr == "systemd"
   tags: [nginx, source]
 
 - name: Ensure nginx configuration file is correct
