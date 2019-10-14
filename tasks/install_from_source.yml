@@ -1,14 +1,6 @@
 ---
 
 #
-# Packages
-#
-
-- name: Install supporting packages for nginx
-  apt: name="{{ item }}" state=present
-  with_items: "{{ nginx_default_source_packages + nginx_custom_source_packages }}"
-
-#
 # User & Group
 #
 
@@ -27,6 +19,14 @@
 - name: Ensure user exists
   when: "{{ nginx_user_id is defined }}"
   user: name="{{ nginx_user }}" home="{{ nginx_home_dir }}" comment="{{ nginx_user }}" group="{{ nginx_group }}" shell=/usr/sbin/nologin uid="{{ nginx_user_id }}"
+
+#
+# Packages
+#
+
+- name: Install supporting packages for nginx
+  apt: name="{{ item }}" state=present
+  with_items: "{{ nginx_default_source_packages + nginx_custom_source_packages }}"
 
 #
 # Download & extract source archive
